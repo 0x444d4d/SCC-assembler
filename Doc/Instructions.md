@@ -11,22 +11,38 @@ haciendo los opcodes lo más largos posibles.
 					R = Registro de lectura
 					W = Registro de escritura
 
-noop:			0000 00XX XXXX XXXX: No toma operandos
-jump:			0000 01DD DDDD DDDD: Salto a D
+noop:		0000 00XX XXXX XXXX: No toma operandos
+
+jump:		0000 01DD DDDD DDDD: Salto a D
+
 jumpz:		0000 10DD DDDD DDDD: Salto a D si flag Zero = 1
+
 nojumpz:	0000 11DD DDDD DDDD: Salto a D si flag Zero = 0
-limm:			0001 IIII IIII WWWW: Cargar I en W
-jal:			0010 00DD DDDD DDDD: Salto a D guardando dir. retorno (PC + 1)
-ret:			0010 01XX XXXX XXXX: No toma operandos
-read:			0010 10SS XXXX WWWW: SS seleccionan el puerto de lectura
+
+limm:		0001 IIII IIII WWWW: Cargar I en W
+
+jal:		0010 00DD DDDD DDDD: Salto a D guardando dir. retorno (PC + 1)
+
+ret:		0010 01XX XXXX XXXX: No toma operandos
+
+read:		0010 10SS XXXX WWWW: SS seleccionan el puerto de lectura
+
 write:		0010 11SS RRRR XXXX: SS seleccionan el puerto de escritura
-MOV:      1000 RRRR XXXX WWWW: Guarda R en W
-NEG:      1001 RRRR XXXX WWWW: Niega R y guarda en W
-ADD:			1010 RRRR RRRR WWWW: R1 + R2 -> W
-SUB:			1011 RRRR RRRR WWWW: R1 - R2 -> W
-AND:			1100 RRRR RRRR WWWW: R1 & R2 -> W
-OR:				1101 RRRR RRRR WWWW: R1 | R2 -> W
+
+MOV:	 	1000 RRRR XXXX WWWW: Guarda R en W
+
+NEG:     	1001 RRRR XXXX WWWW: Niega R y guarda en W
+
+ADD:		1010 RRRR RRRR WWWW: R1 + R2 -> W
+
+SUB:		1011 RRRR RRRR WWWW: R1 - R2 -> W
+
+AND:		1100 RRRR RRRR WWWW: R1 & R2 -> W
+
+OR:		1101 RRRR RRRR WWWW: R1 | R2 -> W
+
 SIGNA:		1110 RRRR XXXX WWWW: Cambia signo a R y guarda en W
+
 SIGNB:		1110 XXXX RRRR WWWW: Cambia signo a R y guarda en W
 
 
