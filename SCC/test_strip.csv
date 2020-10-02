@@ -1,0 +1,5 @@
+#This is a comment
+jump etiqueta
+:etiqueta
+add zero R2 R1 #This is a commented line
+limm 127 R3
