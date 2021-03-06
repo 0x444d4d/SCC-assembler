@@ -1,6 +1,11 @@
 
 directions = {}
 
+# O -> opcode
+# 0 -> empty
+# X -> opcode
+# Z -> opcode
+# Y -> opcode
 JUMP_RULE = 'OOOOOOXXXXXXXXXX'
 ALU_LEFT_RULE = 'OOOOXXXX0000YYYY'
 ALU_RIGHT_RULE = 'OOOO0000XXXXYYYY'

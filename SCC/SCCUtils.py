@@ -3,13 +3,20 @@ import re
 
 from SCCDicts import *
 
+def writeList2File(fileName, list, append=0):
+    mode = ('w', 'a')[append]
+    with open(fileName, mode) as file:
+        for item in list:
+            print(item)
+            file.write(f'{item}\n')
+
 def isRegister(operand):
     return registers[operand]
 
 def isImm(operand):
     
     if int(operand) > 128:
-        raise Exception(f'Operand too large. Must be under 8 bits')
+        raise Exception(f'Operand too large. Must be under 8 bits. Received {operand}')
 
     operand = format(int(operand), '08b')
     return operand 
@@ -18,18 +25,19 @@ def isOther(operand):
     if operand in directions:
         return directions[operand]
     else:
-        raise Exception(f'Operand not recognized')
+        raise Exception(f'Operand not recognized. Received {operand}')
 
 def opType(operand):
     regexps = [r'(?:R(?:1[0-5]|[1-9])|zero)', r'[0-9]+', r'[:a-zA-Z0-9]']
-    functions = [isRegister, isImm, isOther]
+    functions = [isRegister, isImm, isOther] # This is a function list
     index = -1
     for regex in regexps:
         index += 1
         if re.match(regex, operand):
-            return functions[index](operand) 
+            # Now a function is applied to the item to turn it into binary code
+            return functions[index](operand)
 
-    raise Exception(f'operand ', operand, f' is not valid')
+    raise Exception(f'Operand {operand} is not valid')
 
 def operateFile(file, func):
     result = func(file)
@@ -78,12 +86,7 @@ def resolveDirections(file):
             directions[match.group(1)] = format(instructionDir, '010b')
         else:
             instructionDir += 1
-    
 
-def read_file(path):
-    file = tempfile.TemporaryFile()
-    strip_input(file, path)
-    return read_mem_file(file)
 
 
 def strip_input(out_file, csvFile):
