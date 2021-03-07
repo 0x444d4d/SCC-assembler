@@ -1,0 +1,10 @@
+noop
+limm 0 R1
+limm 1 R2
+limm 10 R3
+:for
+add R1 R2 R1
+sub R3 R1 zero 
+jnz for
+:end
+jump end

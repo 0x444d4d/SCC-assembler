@@ -28,18 +28,20 @@ class qtSCC(QMainWindow, Ui_qtSCC):
         self.show()
 
     def onSaveButtonClicked(self):
-        fileName = self.saveEdit.text()
-        SCCUtils.writeList2File(fileName, self.binaryCode)
+        pass
+        # fileName = self.saveEdit.text()
+        # SCCUtils.writeList2File(fileName, self.binaryCode)
 
     def onAssembleButtonClicked(self):
-        fileName = self.inputEdit.text()
-        # TODO: check if file exists. If so process it.
-        with open(fileName, 'r') as inputFile:
-            SCCUtils.strip_input(self.virtual_file, inputFile)
-            SCCUtils.operatiFile(self.virtual_file, resolveDirections)
-            self.binaryCode = SCCUtils.operateFile(self.virtual_file, translate)
+        for fileName in self.translationQueue:
+            binaryCode = self.assembleFile(fileName)
+            binFileName = fileName.split('.')[0];
+            binFileName = binFileName + ".bin"
+            SCCUtils.writeList2File(binFileName, binaryCode) 
+        self.translationQueue = []; 
 
     def onSearchButtonClicked(self):
+        self.fileList.clear()
         path = self.inputEdit.text()
         path = QDir(path)
         print(path.dirName())
@@ -47,7 +49,7 @@ class qtSCC(QMainWindow, Ui_qtSCC):
         contentsList = path.entryList()
         for content in contentsList:
             basePath = self.inputEdit.text()
-            filePath = os.path.join(basePath, item.text())
+            filePath = os.path.join(basePath, content)
             self.fileList.addItem(content)
 
     def onFileListItemClicked(self, item):
@@ -58,7 +60,14 @@ class qtSCC(QMainWindow, Ui_qtSCC):
 
     def onTranslateListItemClicked(self, item):
         self.translationQueue.remove(item.text())
-        self.translateList.takeItem(sefl.translateList.currentRow())
+        self.translateList.takeItem(self.translateList.currentRow())
+
+    def assembleFile(self, fileName):
+        with open(fileName, 'r') as inputFile:
+            SCCUtils.strip_input(self.virtual_file, inputFile)
+            SCCUtils.operateFile(self.virtual_file, SCCUtils.resolveDirections)
+            binaryCode = SCCUtils.operateFile(self.virtual_file, SCCUtils.translate)
+            return binaryCode
 
 if  __name__  ==  "__main__":
     app = QApplication([])
