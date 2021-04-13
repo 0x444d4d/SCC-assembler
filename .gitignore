@@ -1,0 +1,4 @@
+./**/test_strip.csv
+./**/__pycache__
+unit_tests.py
+tests/
