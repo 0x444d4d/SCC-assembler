@@ -7,7 +7,6 @@ def writeList2File(fileName, list, append=0):
     mode = ('w', 'a')[append]
     with open(fileName, mode) as file:
         for item in list:
-            print(item)
             file.write(f'{item}\n')
 
 def isRegister(operand):
@@ -22,14 +21,26 @@ def isImm(operand):
     return operand 
 
 def isOther(operand):
+    if operand in prep_rules:
+        return opType(prep_rules[operand])
     if operand in directions:
         return directions[operand]
     else:
         raise Exception(f'Operand not recognized. Received {operand}')
 
+def isAddr(operand):
+    address = re.search(r'([0-9]+)', operand).group() 
+
+    if re.match(r'^io\([0-9]+\)',operand):
+        return '000000' + format(int(address), '02b')
+    if re.match(r'^int\([0-9]+\)',operand):
+        return '00001' + format(int(address), '03b')
+    if re.match(r'^data\([0-9]+\)',operand):
+        return '1' + format(int(address), '07b')
+
 def opType(operand):
-    regexps = [r'(?:R(?:1[0-5]|[1-9])|zero)', r'[0-9]+', r'[:a-zA-Z0-9]']
-    functions = [isRegister, isImm, isOther] # This is a function list
+    regexps = [r'(?:R(?:1[0-5]|[1-9])|zero)', r'[0-9]+', r'(io|data|int)\(([0-9]+)\)', r'[:a-zA-Z0-9]']
+    functions = [isRegister, isImm, isAddr, isOther] # This is a function list
     index = -1
     for regex in regexps:
         index += 1
@@ -66,40 +77,42 @@ def translate(file):
             s = 'X'
             for item in items:
                 operand = opType(item)
-                operation = re.sub(s+'+', operand, operation)
+                occurences = len(re.search(s+'+', operation).group())
+                operation = re.sub(s+'+', operand[:occurences], operation)
                 s = chr((ord(s) + 1))
 
             result.append(str(operation))
         elif items[0][0] == ':':
             continue
         else:
-            raise Exception(f'ERROR: {line[0]} in not a valid opcode')
+            raise Exception(f'ERROR: {line.split()[0]} in not a valid opcode')
     return result
         
 def resolveDirections(file):
     
     instructionDir = 0
     for line in file:
-        line = line.strip('\n')
-        match = re.search(r'^:([a-zA-Z0-9]*)', line)
+        match = re.search(r'^:([a-zA-Z0-9_-]+)', line)
         if match:
             directions[match.group(1)] = format(instructionDir, '010b')
         else:
             instructionDir += 1
 
 
-
 def strip_input(out_file, csvFile):
     #with open(path, 'r') as csvFile:
     lines = csvFile.read().splitlines()
-    for line in lines:
-        if re.match(r'^#', line): #If line is a comment ignore it
-            continue
-        elif re.search(r'#', line): #Strip comment ater instruction
-            index = re.search(r'#', line).start()
-            out_file.write(line[0:index]+'\n')
-        else: #Add instruction to virtual file
-            out_file.write(line+'\n')
+    code_section = preprocess(lines)
+    for line in lines[code_section:]:
+        line = line.strip()
+        if line:
+            if re.match(r'^#', line): #If line is a comment ignore it
+                continue
+            elif re.search(r'#', line): #Strip comment ater instruction
+                index = re.search(r'#', line).start()
+                out_file.write(line[0:index]+'\n')
+            else: #Add instruction to virtual file
+                out_file.write(line+'\n')
     #Make file ready to be read again
     out_file.seek(0)
 
@@ -116,3 +129,15 @@ def read_mem_file( input_file ):
             opc, op1, op2 = instruction["opcode"], instruction["op1"], instruction["op2"]
             return_code.append({"opcode":opc, "op1":op1, "op2":op2})
     return return_code
+
+def preprocess( lines ):
+    begining = 0
+    for line in lines:
+        if line != '.code':
+            match = re.search(r'^use ([a-zA-Z0-9]+) as ([a-zA-Z0-9\(\)]+$)',line)
+            if match is not None:
+                prep_rules[match.group(1)] = match.group(2)
+            begining += 1
+        else:
+            return begining + 1
+    return None

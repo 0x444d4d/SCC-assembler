@@ -14,6 +14,13 @@ IMM_RULE = 'OOOOXXXXXXXXYYYY'
 NOOP_RULE = 'OOOOOO0000000000'
 PORT_READ_RULE = 'OOOOOOXX0000YYYY'
 PORT_WRITE_RULE = 'OOOOOOXXYYYYZZZZ'
+WORD_WRITE_RULE = 'OOOOYYYYXXXXXXXX'
+WORD_READ_RULE = 'OOOOXXXXXXXXYYYY'
+ADDR_WRITE_RULE = 'OOOOXXXXYYYY0000'
+ADDR_READ_RULE = 'OOOO0000XXXXYYYY'
+
+prep_rules = {
+                                }
 
 registers = {   'zero':'0000',
                 'R1': '0001',
@@ -37,11 +44,13 @@ rules = {       'noop': NOOP_RULE,
                 'jump': JUMP_RULE,
                 'jz': JUMP_RULE,
                 'jnz': JUMP_RULE,
-                'limm': IMM_RULE,
-                'jal': JUMP_RULE,
+                'li': IMM_RULE,
+                'lw': WORD_READ_RULE,
+                'sw': WORD_WRITE_RULE,
+                'la': ADDR_READ_RULE,
+                'sa': ADDR_WRITE_RULE,
+                'call': JUMP_RULE,
                 'ret': NOOP_RULE,
-                'read': PORT_READ_RULE,
-                'write': PORT_WRITE_RULE,
                 'mov': ALU_LEFT_RULE,
                 'not': ALU_LEFT_RULE,
                 'add': ALU_BOTH_RULE,
@@ -55,11 +64,13 @@ opcodeDict = {  'noop':'000000',
                 'jump':"000001",
                 'jz':'000010',
                 'jnz':'000011',
-                'limm':'0001',
-                'jal':'001000',
-                'ret':'001001',
-                'read':'001010',
-                'write':'001011',
+                'li':'0001',
+                'call':'010000',
+                'ret':'010100',
+                'lw':'0010',
+                'sw':'0011',
+                'la':'0110',
+                'sa':'0111',
                 'mov':'1000',
                 'not':'1001',
                 'add':'1010',
