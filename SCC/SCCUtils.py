@@ -14,11 +14,15 @@ def isRegister(operand):
 
 def isImm(operand):
     
-    if int(operand) > 128:
+    if (operand[0] == 'b'):
+        if (len(operand[1:]) > 8):
+            raise Exception(f'Operand too large. Must be under 8 bits. Received {operand}')
+        else:
+            return operand[1:]
+        
+    elif int(operand) > 255:
         raise Exception(f'Operand too large. Must be under 8 bits. Received {operand}')
-
-    operand = format(int(operand), '08b')
-    return operand 
+    return format(int(operand), '08b')
 
 def isOther(operand):
     if operand in prep_rules:
@@ -39,7 +43,7 @@ def isAddr(operand):
         return '1' + format(int(address), '07b')
 
 def opType(operand):
-    regexps = [r'(?:R(?:1[0-5]|[1-9])|zero)', r'[0-9]+', r'(io|data|int)\(([0-9]+)\)', r'[:a-zA-Z0-9]']
+    regexps = [r'(?:R(?:1[0-5]|[1-9])|zero)', r'b?[0-9]+', r'(io|data|int)\(([0-9]+)\)', r'[:a-zA-Z0-9]']
     functions = [isRegister, isImm, isAddr, isOther] # This is a function list
     index = -1
     for regex in regexps:
