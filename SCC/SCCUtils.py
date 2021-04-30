@@ -25,9 +25,14 @@ def isImm(operand):
     return format(int(operand), '08b')
 
 def isOther(operand):
+    InPrepRules = False
     if operand in prep_rules:
+        InPrepRules = True
         return opType(prep_rules[operand])
     if operand in directions:
+        if InPrepRules is True:
+            raise Exception(f'Operand {operand} used as an address tag and preprocessor rule')
+        print(f'{operand} : {directions[operand]}')
         return directions[operand]
     else:
         raise Exception(f'Operand not recognized. Received {operand}')
@@ -82,7 +87,9 @@ def translate(file):
             for item in items:
                 operand = opType(item)
                 occurences = len(re.search(s+'+', operation).group())
-                operation = re.sub(s+'+', operand[:occurences], operation)
+                if occurences < len(operand):
+                    operand = operand[len(operand) - occurences:]
+                operation = re.sub(s+'+', operand, operation)
                 s = chr((ord(s) + 1))
 
             result.append(str(operation))
